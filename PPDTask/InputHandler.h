@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "List.h"
 
 #ifndef Parser_h
 #define Parser_h
@@ -51,11 +52,16 @@ typedef struct Parser {
     // Parameters
     char firstParamater[MAX_INPUT_SIZE];
     char secondParamter[MAX_INPUT_SIZE];
-    char thirdParameter[MAX_INPUT_SIZE];
+    char thirdParameter[MAX_INPUT_SIZE*8];
     // Type of input
     InputType type;
 } Parser;
 
+int isEqualString(void* info1, void* info2) {
+    char* c1 = (char*)info1;
+    char* c2 = (char*)info2;
+    return strcmp(c1, c2);
+}
 
 /// Returns the type of input that string represents
 InputType getInputTypeFromString(char* string, struct Parser* parser) {
@@ -96,6 +102,23 @@ char* getStringFromStdin() {
     inputString[i] = '\0';
     return inputString;
 }
+/// All names for the group will be stored in the third parameter string
+void adaptParserForGroupCreationWithInputString(struct Parser* parser, char* inputString) {
+    strcpy(parser->thirdParameter, "");
+    int i = 0;
+    int bufferIterator = 0;
+    int amountOfSpaces = 0;
+    while (i < strlen(inputString) ) {
+        if( amountOfSpaces < 2 && inputString[i] == ' ' ) {
+            amountOfSpaces++;
+        }else if( amountOfSpaces >= 2 ) {
+            parser->thirdParameter[bufferIterator] = inputString[i];
+            bufferIterator++;
+        }
+        i++;
+    }
+    
+}
 /// Prompts user for input and returns the provided parameters as part of the Parser Structure
 Parser askAndParseUserInput() {
     // Populate this to get all parameters
@@ -108,6 +131,9 @@ Parser askAndParseUserInput() {
     printf("Enter a valid command:\n");
     char* inputString = getStringFromStdin();
     parser.type = getInputTypeFromString(inputString, &parser);
+    if( parser.type == InsertGroupInGroupList ) {
+        adaptParserForGroupCreationWithInputString(&parser, inputString);
+    }
     
     // Free Allocation
     free(inputString);

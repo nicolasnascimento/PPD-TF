@@ -20,9 +20,7 @@
 #include <pthread.h>
 #include <errno.h>
 
-#include "CommunicatorList.h"
 #include "Package.h"
-#include "Communicator.h"
 #include "Server.h"
 
 #define MAX_IP_ADDRESS_LENGTH 32
@@ -88,6 +86,9 @@ void initClientThreadWithPackageAndIpAddress(struct Package package, char* ipAdd
     
     // The thread to serve as the client
     pthread_t clientThread;
+    
+    // Dynamic allocation to assure data persistance
+    // The sending thread hass to free this memory
     ClientData* data = malloc(sizeof(ClientData));
     
     printf("Initialization Client\n");

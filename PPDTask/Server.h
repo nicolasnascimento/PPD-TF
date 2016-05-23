@@ -14,7 +14,6 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <pthread.h>
-#include "CommunicatorList.h"
 #include "Contact.h"
 #include "Package.h"
 
@@ -25,9 +24,6 @@
 
 // The thread to serve as the server
 pthread_t serverThread;
-
-// The list of communicators
-CommunicatorList serverCommunicatorList;
 
 // This is the server function
 void* serverLoop() {
@@ -87,9 +83,6 @@ void initServerThread() {
     
     printf("Initialization Server\n");
     
-    // Initializes the communicator list
-    initCommunicatorList(&serverCommunicatorList);
-    
     // Initializes the thread
     if( pthread_create(&serverThread, NULL, serverLoop, NULL)) {
         fprintf(stderr, "Error while creating server thread, aborting");
@@ -99,8 +92,6 @@ void initServerThread() {
 
 // Destroys resources used in the server
 void stopServerThread() {
-    // Destroys the communicator list
-    destroyCommunicatorList(&serverCommunicatorList);
     
     // Kills the server thread
     pthread_kill(serverThread, 0);

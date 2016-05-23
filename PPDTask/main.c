@@ -13,8 +13,6 @@
 #include "InputHandler.h"
 #include "Package.h"
 #include "Server.h"
-#include "Communicator.h"
-#include "CommunicatorList.h"
 #include "Client.h"
 #include "Contact.h"
 #include "LocalContact.h"
@@ -89,7 +87,6 @@ void initMainLoop() {
                 printf("Terminating\n");
                 exit(EXIT_SUCCESS);
         }
-        printf("%s %s %s\n", parser.firstParamater, parser.secondParamter, parser.thirdParameter);
     }
 }
 

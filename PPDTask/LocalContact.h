@@ -15,6 +15,7 @@
 
 #include "Contact.h"
 #include "InputHandler.h"
+#include "List.h"
 
 /// Structure for the local contact
 typedef struct LocalContact{
