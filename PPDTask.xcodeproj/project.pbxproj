@@ -23,8 +23,15 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		0C0CB41F1CF207D6000D0675 /* Client.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Client.h; sourceTree = "<group>"; };
+		0C0CB4201CF219C5000D0675 /* Contact.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Contact.h; sourceTree = "<group>"; };
 		0CA95E491CEFC2EA0070AC6D /* PPDTask */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = PPDTask; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CA95E4C1CEFC2EA0070AC6D /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		0CA95E531CEFC7BB0070AC6D /* InputHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InputHandler.h; sourceTree = "<group>"; };
+		0CA95E561CEFD2DA0070AC6D /* List.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = List.h; sourceTree = "<group>"; };
+		0CA95E581CEFD3510070AC6D /* Package.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Package.h; sourceTree = "<group>"; };
+		0CA95E5E1CEFD7730070AC6D /* Server.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Server.h; sourceTree = "<group>"; };
+		0CD925C51CF31AC2005841C2 /* LocalContact.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = LocalContact.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,9 +64,48 @@
 		0CA95E4B1CEFC2EA0070AC6D /* PPDTask */ = {
 			isa = PBXGroup;
 			children = (
+				0CA95E591CEFD38C0070AC6D /* Util */,
+				0CA95E5A1CEFD3910070AC6D /* UI */,
 				0CA95E4C1CEFC2EA0070AC6D /* main.c */,
+				0CA95E5B1CEFD3970070AC6D /* Model */,
+				0CA95E5D1CEFD7400070AC6D /* Communication */,
 			);
 			path = PPDTask;
+			sourceTree = "<group>";
+		};
+		0CA95E591CEFD38C0070AC6D /* Util */ = {
+			isa = PBXGroup;
+			children = (
+				0CA95E561CEFD2DA0070AC6D /* List.h */,
+			);
+			name = Util;
+			sourceTree = "<group>";
+		};
+		0CA95E5A1CEFD3910070AC6D /* UI */ = {
+			isa = PBXGroup;
+			children = (
+				0CA95E531CEFC7BB0070AC6D /* InputHandler.h */,
+			);
+			name = UI;
+			sourceTree = "<group>";
+		};
+		0CA95E5B1CEFD3970070AC6D /* Model */ = {
+			isa = PBXGroup;
+			children = (
+				0CA95E581CEFD3510070AC6D /* Package.h */,
+				0C0CB4201CF219C5000D0675 /* Contact.h */,
+				0CD925C51CF31AC2005841C2 /* LocalContact.h */,
+			);
+			name = Model;
+			sourceTree = "<group>";
+		};
+		0CA95E5D1CEFD7400070AC6D /* Communication */ = {
+			isa = PBXGroup;
+			children = (
+				0CA95E5E1CEFD7730070AC6D /* Server.h */,
+				0C0CB41F1CF207D6000D0675 /* Client.h */,
+			);
+			name = Communication;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -239,6 +285,7 @@
 				0CA95E521CEFC2EA0070AC6D /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
 	};
