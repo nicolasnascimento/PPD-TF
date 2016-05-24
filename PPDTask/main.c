@@ -17,6 +17,7 @@
 #include "Contact.h"
 #include "LocalContact.h"
 #include "List.h"
+#include "Message.h"
 
 // Should allocated and initialize all resources
 void init() {
@@ -35,19 +36,21 @@ void cleanUpOnExit() {
     deallocLocalContact();
 }
 /// Sends a message to the contact if it's in the contact list
-void sendMessageToContact(char* message, char* name) {
+void sendMessageToContact(char* messageDescription, char* name) {
     // TODO - Improve this
     
     Contact* c = searchContactWithName(name);
     if( c != NULL ) {
-        Package package = createPackageForMessageDescriptionFromSender(message, "Nicolas");
+        // Creates the package and the message
+        Package package = createPackageForMessageDescriptionFromSender(messageDescription, localContact.contact->name);
+        Message message = createMessageForOwnerWithDescription(localContact.contact->name, messageDescription);
+        // Saves locally before propagating
+        saveNewMessageForContact(&message, c);
+        // Creates the client thread to send the message
         initClientThreadWithPackageAndIpAddress(package, c->ipAddress);
     }else{
         printf("%s is not in contact list\n", name);
     }
-   /* Contact contact = createContactWithNameAndIpAddress(name, "192.168.0.15");
-    Package package = createPackageForMessageDescriptionFromSender(message, "Nicolas");
-    initClientThreadWithPackageAndIpAddress(package, contact.ipAddress);*/
 }
 /// Inserts a contact in the contact list
 void insertContactInContactList(char* name, char* ipAddress) {

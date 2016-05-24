@@ -6,11 +6,11 @@
 //  Copyright © 2016 LastLeaf. All rights reserved.
 //
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #ifndef List_h
 #define List_h
+
+#include <stdio.h>
+#include <stdlib.h>
 
 /// The function that tells wheter and object is equal to another
 typedef int(*comparatorFunction)(void*,void*);

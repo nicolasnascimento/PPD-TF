@@ -6,6 +6,10 @@
 //  Copyright © 2016 LastLeaf. All rights reserved.
 //
 
+
+#ifndef Server_h
+#define Server_h
+
 #include <stdio.h>
 #include <string.h>
 #include <sys/socket.h>
@@ -14,16 +18,76 @@
 #include <netdb.h>
 #include <arpa/inet.h>
 #include <pthread.h>
-#include "Contact.h"
-#include "Package.h"
 
-#ifndef Server_h
-#define Server_h
+#include "LocalContact.h"
+#include "Package.h"
+#include "Contact.h"
+#include "Message.h"
 
 #define SERVER_PORT 12345
 
 // The thread to serve as the server
 pthread_t serverThread;
+
+typedef struct ServerData{
+    // The original received package
+    Package originalPackage;
+    // A reference to the socket(used to send and receive)
+    int socketReference;
+} ServerData;
+
+/// The function to be used to save the received message
+void* backgroundFunction(void* data) {
+    // Retrieves the data
+    ServerData* serverData = (ServerData*)data;
+    
+    // Tries to find the contact
+    Contact* contact = searchContactWithName(serverData->originalPackage.senderName);
+    if( contact == NULL ) {
+        printf("Couldn't finc contact %s in contact list, aborting\n", serverData->originalPackage.senderName);
+        return NULL;
+    }
+    
+    // Treat all package cases
+    switch (serverData->originalPackage.type) {
+        case MessageReceived:
+            printf("\n");
+            Message messageReceived = createMessageForOwnerWithDescription(serverData->originalPackage.senderName, serverData->originalPackage.description);
+            updateMessageStatusForContactWithMessageStatus(&messageReceived, contact, Received);
+            break;
+        case MessageRead:
+            printf("\n");
+            Message messageRead = createMessageForOwnerWithDescription(serverData->originalPackage.senderName, serverData->originalPackage.description);
+            updateMessageStatusForContactWithMessageStatus(&messageRead, contact, Received);
+            break;
+        case MessageDescription:
+            printf("\n");
+            Message messageDescription = createMessageForOwnerWithDescription(serverData->originalPackage.senderName, serverData->originalPackage.description);
+            updateMessageStatusForContactWithMessageStatus(&messageDescription, contact, Received);
+            break;
+    }
+    
+    // Deallocates the data
+    free(serverData);
+    return NULL;
+}
+
+// Creates the background thread to avoid blocking connections
+void createBackgroundThreadToHandlePackageWithSocketReference(struct Package package, int socketReference) {
+    // The background thread
+    pthread_t backgroundThread;
+    
+    // The data to be passed to the function
+    ServerData* serverData = malloc(sizeof(ServerData));
+    serverData->originalPackage = package;
+    serverData->socketReference = socketReference;
+    
+    // Initializes the thread
+    if( pthread_create(&backgroundThread, NULL, backgroundFunction, serverData)) {
+        fprintf(stderr, "Error while creating background thread, aborting");
+        return;
+    }
+}
 
 // This is the server function
 void* serverLoop() {
@@ -62,21 +126,22 @@ void* serverLoop() {
     // Begins listening for connections
     listen(socketReference, 2);
     
-    // Keeps awaiting for connections
     while (1) {
+        // Keeps awaiting for connections
         connectionReference = accept(socketReference, &client, &clientSocketLength);
         
         printf("did receive connection\n");
-        
         // Receives the package
-        // The packaged should contain enough information so that the server knows whats to do
         receivedReturnValue = recv(connectionReference, &package, sizeof(Package), 0);
         
-        //printf("senderIp: %s, receiverIp: %s\n", package.senderIp, package.receiverIp);
+        // Avoid blocking server for too long, use a background thread
+        createBackgroundThreadToHandlePackageWithSocketReference(package, socketReference);
     }
     
     return NULL;
 }
+
+
 
 /// Initializes resources for server thread
 void initServerThread() {

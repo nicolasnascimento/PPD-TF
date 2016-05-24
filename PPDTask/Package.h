@@ -56,6 +56,11 @@ Package createPackageForMessageReadFromSender(char* senderName) {
 Package createPackageForMessageDescriptionFromSender(char* description, char* senderName) {
     return createFullPackage(MessageDescription, description, senderName);
 }
-
+/// Allocates a new package using a static package as parameter
+Package* allocPackageWithPackage(struct Package package) {
+    Package* p = malloc(sizeof(Package));
+    *p = createFullPackage(package.type, package.description, package.senderName);
+    return p;
+}
 
 #endif /* Package_h */

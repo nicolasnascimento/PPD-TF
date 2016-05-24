@@ -9,7 +9,6 @@
 #ifndef Client_h
 #define Client_h
 
-
 #include <stdio.h>
 #include <string.h>
 #include <sys/socket.h>
@@ -24,6 +23,8 @@
 #include "Server.h"
 
 #define MAX_IP_ADDRESS_LENGTH 32
+
+#define SERVER_PORT 12345
 
 typedef struct ClientData{
     // The package to be sent

@@ -25,6 +25,7 @@
 /* Begin PBXFileReference section */
 		0C0CB41F1CF207D6000D0675 /* Client.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Client.h; sourceTree = "<group>"; };
 		0C0CB4201CF219C5000D0675 /* Contact.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Contact.h; sourceTree = "<group>"; };
+		0C137C481CF46C8500D71D49 /* Message.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Message.h; sourceTree = "<group>"; };
 		0CA95E491CEFC2EA0070AC6D /* PPDTask */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = PPDTask; sourceTree = BUILT_PRODUCTS_DIR; };
 		0CA95E4C1CEFC2EA0070AC6D /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
 		0CA95E531CEFC7BB0070AC6D /* InputHandler.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = InputHandler.h; sourceTree = "<group>"; };
@@ -95,6 +96,7 @@
 				0CA95E581CEFD3510070AC6D /* Package.h */,
 				0C0CB4201CF219C5000D0675 /* Contact.h */,
 				0CD925C51CF31AC2005841C2 /* LocalContact.h */,
+				0C137C481CF46C8500D71D49 /* Message.h */,
 			);
 			name = Model;
 			sourceTree = "<group>";
@@ -255,6 +257,7 @@
 		0CA95E511CEFC2EA0070AC6D /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				INSTALL_PATH = /usr/local/bin;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 			};
 			name = Debug;

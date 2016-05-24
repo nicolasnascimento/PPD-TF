@@ -58,7 +58,7 @@ void saveContactWithFileStream(struct Contact* contact, FILE* filePointer) {
 }
 void saveContact(struct Contact* contact) {
     // Opens data file
-    FILE* filePointer = fopen(contact->name, "w");
+    FILE* filePointer = fopen(contact->name, "wb");
     if( !filePointer ) {
         fprintf(stderr, "Error while saving user %s\n",contact->name);
         fclose(filePointer);
@@ -73,7 +73,7 @@ void saveContact(struct Contact* contact) {
 Contact* allocContactFromFileWithName(char* fileName) {
     Contact c;
     // Opens data file
-    FILE* filePointer = fopen(fileName, "r");
+    FILE* filePointer = fopen(fileName, "rb");
     if( !filePointer ) {
         fprintf(stderr, "Error while loading user from file %s\n", fileName);
         fclose(filePointer);
@@ -87,7 +87,7 @@ Contact* allocContactFromFileWithName(char* fileName) {
 }
 // Printing
 void printDescriptionForContact(struct Contact* contact) {
-    printf("Name: %s, ipAddress: %s", contact->name, contact->ipAddress);
+    printf("Name: %s, ipAddress: %s\n", contact->name, contact->ipAddress);
 }
 
 #endif /* Contact_h */

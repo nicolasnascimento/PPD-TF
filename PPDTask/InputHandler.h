@@ -6,13 +6,13 @@
 //  Copyright © 2016 LastLeaf. All rights reserved.
 //
 
+#ifndef Parser_h
+#define Parser_h
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include "List.h"
-
-#ifndef Parser_h
-#define Parser_h
 
 #define MAX_INPUT_SIZE 200
 
