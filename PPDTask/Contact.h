@@ -76,7 +76,6 @@ Contact* allocContactFromFileWithName(char* fileName) {
     FILE* filePointer = fopen(fileName, "rb");
     if( !filePointer ) {
         fprintf(stderr, "Error while loading user from file %s\n", fileName);
-        fclose(filePointer);
         return NULL;
     }
     // Reads file
