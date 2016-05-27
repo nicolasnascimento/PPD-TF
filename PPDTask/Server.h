@@ -44,11 +44,11 @@ void* backgroundFunction(void* data) {
     // Tries to find the contact
     Contact* contact = searchContactWithName(serverData->originalPackage.senderName);
     if( contact == NULL ) {
-        printf("Couldn't finc contact %s in contact list, aborting\n", serverData->originalPackage.senderName);
+        printf("Couldn't find contact %s in contact list, aborting\n", serverData->originalPackage.senderName);
         return NULL;
     }
     
-    // Treat all package cases
+    // Treat all package cases, first locally
     switch (serverData->originalPackage.type) {
         case MessageReceived:
             printf("\n");
@@ -58,14 +58,16 @@ void* backgroundFunction(void* data) {
         case MessageRead:
             printf("\n");
             Message messageRead = createMessageForOwnerWithDescription(serverData->originalPackage.senderName, serverData->originalPackage.description);
-            updateMessageStatusForContactWithMessageStatus(&messageRead, contact, Received);
+            updateMessageStatusForContactWithMessageStatus(&messageRead, contact, Read);
             break;
         case MessageDescription:
             printf("\n");
             Message messageDescription = createMessageForOwnerWithDescription(serverData->originalPackage.senderName, serverData->originalPackage.description);
-            updateMessageStatusForContactWithMessageStatus(&messageDescription, contact, Received);
+            saveNewMessageForContact(&messageDescription, contact, Received);
             break;
     }
+
+    // TODO - Now propagate the result to the sender
     
     // Deallocates the data
     free(serverData);

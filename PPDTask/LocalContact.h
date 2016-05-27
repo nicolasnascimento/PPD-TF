@@ -37,11 +37,8 @@ void populateContactListFromFileWithName(struct List* list, char* fileName) {
     FILE* filePointer = fopen(fileName, "rb");
     if( !filePointer ) {
         printf("Contact list is empty\n");
-        fclose(filePointer);
         // Creates the file
-        FILE * newFilePointer = fopen(fileName, "wb");
-        fclose(newFilePointer);
-        return;
+        filePointer = fopen(fileName, "w+b");
     }
     Contact c;
     while ( !feof(filePointer) ) {
@@ -52,10 +49,13 @@ void populateContactListFromFileWithName(struct List* list, char* fileName) {
             appendObject(list, allocContacWithNameAndIpAddress(c.name, c.ipAddress));
         }
     }
+    // Closes file
+    fclose(filePointer);
 }
 /// Standard initialization
 void allocLocalContact() {
     // Contact
+    
     localContact.contact = allocContactFromFileWithName(localUserFileName);
     // if this file doesn't exit, the application if being run for the first time
     if( !localContact.contact ) {
