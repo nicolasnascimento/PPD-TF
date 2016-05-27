@@ -77,7 +77,7 @@ void updateMessageStatusForContactWithMessageStatus(struct Message* message, str
         printf("%s doesn't have any messages yet\n", contact->name);
     }else{
         do {
-            // Empty message to be used during iteration
+            // Empty message to be used during iterationq
             Message m = createMessageForOwnerWithDescription("", "");
             // Reads message
             fread(&m, sizeof(Message), 1, filePointer);
