@@ -138,6 +138,7 @@ Parser askAndParseUserInput() {
     
     // Free Allocation
     free(inputString);
+    inputString = NULL;
     return parser;
 }
 

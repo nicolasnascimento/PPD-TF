@@ -67,6 +67,7 @@ void allocLocalContact() {
         localContact.contact = allocContacWithNameAndIpAddress(name, "0.0.0.0");
         fwrite(localContact.contact, sizeof(Contact), 1, newFilePointer);
         free(name);
+        name = NULL;
         fclose(newFilePointer);
     }
     // Contac list
@@ -76,7 +77,7 @@ void allocLocalContact() {
 // Iteration function
 void saveContactFromList(void* info) {
     Contact* c = (Contact*)info;
-    FILE* filePointer = fopen(localUserContactsListFileName, "ab");
+    FILE* filePointer = fopen(localUserContactsListFileName, "wb");
     saveContactWithFileStream(c, filePointer);
     fclose(filePointer);
 }
@@ -107,7 +108,7 @@ void printLocalUserDescription() {
     printDescriptionForContact(localContact.contact);
     printf("[\n ");
     forEachObjectInList(localContact.contactList, printContactFromList);
-    printf(" ]\n");
+    printf("]\n");
 }
 
 #endif /* LocalContact_h */

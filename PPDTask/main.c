@@ -58,7 +58,18 @@ void insertContactInContactList(char* name, char* ipAddress) {
     appendObject(localContact.contactList, c);
     printLocalUserDescription();
 }
-
+/// Lists all contacts and groups from the local contact
+void listContactsAndGroups() {
+    printLocalUserDescription();
+}
+void listMessagesWithContact(char* name) {
+    Contact* c = searchContactWithName(name);
+    if( c != NULL ) {
+        listMessagesForContact(c);
+    }else{
+        printf("Couldn't find contact with name %s\n", name);
+    }
+}
 // Main Thread Loop
 // This will provide the UI and others front-end features
 void initMainLoop() {
@@ -67,9 +78,11 @@ void initMainLoop() {
         Parser parser = askAndParseUserInput();
         switch (parser.type) {
             case ListMessagesWithContact:
+                listMessagesWithContact(parser.secondParamter);
                 printf("list messages with contact\n");
                 break;
             case ListContactsAndGroups:
+                listContactsAndGroups();
                 printf("list contacts and groups\n");
                 break;
             case InsertGroupInGroupList:

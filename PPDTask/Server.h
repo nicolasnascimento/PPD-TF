@@ -6,6 +6,9 @@
 //  Copyright © 2016 LastLeaf. All rights reserved.
 //
 
+#ifndef SERVER_PORT
+#define SERVER_PORT 12347
+#endif
 
 #ifndef Server_h
 #define Server_h
@@ -24,7 +27,6 @@
 #include "Contact.h"
 #include "Message.h"
 
-#define SERVER_PORT 12345
 
 // The thread to serve as the server
 pthread_t serverThread;
@@ -63,14 +65,14 @@ void* backgroundFunction(void* data) {
         case MessageDescription:
             printf("\n");
             Message messageDescription = createMessageForOwnerWithDescription(serverData->originalPackage.senderName, serverData->originalPackage.description);
-            saveNewMessageForContact(&messageDescription, contact, Received);
+            saveNewMessageForContact(&messageDescription, contact);
             break;
     }
-
-    // TODO - Now propagate the result to the sender
     
     // Deallocates the data
     free(serverData);
+    serverData = NULL;
+    
     return NULL;
 }
 

@@ -40,6 +40,7 @@ Contact* allocContacWithNameAndIpAddress(char* name, char* ipAddress) {
 }
 void deallocContact(void* contact) {
     free(contact);
+    contact = NULL;
 }
 /// Equality Definition
 int isEqualContact(void* info1, void* info2) {

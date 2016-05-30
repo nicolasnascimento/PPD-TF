@@ -24,7 +24,6 @@
 
 #define MAX_IP_ADDRESS_LENGTH 32
 
-#define SERVER_PORT 12345
 
 typedef struct ClientData{
     // The package to be sent
@@ -78,6 +77,7 @@ void* clientFunction(void* data) {
     
     // Deallocates data
     free(clientData);
+    clientData = NULL;
     
     return NULL;
 }
@@ -96,8 +96,8 @@ void initClientThreadWithPackageAndIpAddress(struct Package package, char* ipAdd
     // Copies the data structure
     data->clientPackage = package;
     strcpy(data->ipAddress, ipAddress);
-
-    // Initializes the thread
+    
+    // Initializes the thread to send data
     if( pthread_create(&clientThread, NULL, clientFunction, data)) {
         fprintf(stderr, "Error while creating client thread, aborting");
         return;

@@ -15,7 +15,6 @@
 #include "Package.h"
 #include "Contact.h"
 
-
 /// The possible status
 typedef enum MessageStatus {
     Sent,
@@ -38,7 +37,7 @@ Message createMessageForOwnerWithDescription(char* owner, char* description) {
     Message m;
     strcpy(m.description, description);
     strcpy(m.owner, owner);
-    m.status = Sent;
+    m.status = Received;
     return m;
 }
 // Equality comparision
@@ -67,6 +66,30 @@ void saveNewMessageForContact(struct Message* message, struct Contact* contact) 
         fwrite(message, sizeof(Message), 1, filePointer);
         // Closes file stream
         fclose(filePointer);
+    }
+}
+/// Prints the content of a message to stdout
+void printMessageDescription(struct Message* message) {
+    char readMessage[] = "read";
+    char receiveMessage[] = "received";
+    printf("%s, %s, %s\n", message->owner, message->description, message->status == Read ? readMessage : receiveMessage);
+}
+/// Lists all messages with a given contac
+void listMessagesForContact(struct Contact* contact) {
+    FILE* filePointer = fopen(contact->name, "rb");
+    if( !filePointer ) {
+        printf("You still don't have any messages with %s\n", contact->name);
+    }else{
+        Message m;
+        char clearMessage[] = "";
+        while ( !feof(filePointer) ) {
+            strcpy(m.description, clearMessage);
+            strcpy(m.owner, clearMessage);
+            fread(&m, sizeof(Message), 1, filePointer);
+            if( strcmp(m.owner, clearMessage) != 0 && strcmp(m.description, clearMessage) != 0 ) {
+                printMessageDescription(&m);
+            }
+        }
     }
 }
 /// Updates a message status

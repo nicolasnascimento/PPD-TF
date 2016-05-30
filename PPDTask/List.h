@@ -57,7 +57,9 @@ void deleteNode(struct ListNode* node, struct List* list) {
     }else{
         free(node->info);
     }
+    node->info = NULL;
     free(node);
+    node = NULL;
 }
 
 /// Creates a new List, setting a comparator and deletion function
@@ -129,7 +131,7 @@ void removeObject(struct List* list, void* info) {
                 list->firstNode->previous = NULL;
                 node->next = NULL;
                 deleteNode(node, list);
-                
+                break;
                 // Removes last node
             }else if( list->lastNode == currentNode ) {
                 ListNode* node = list->lastNode;
@@ -137,7 +139,7 @@ void removeObject(struct List* list, void* info) {
                 list->lastNode->next = NULL;
                 node->previous = NULL;
                 deleteNode(node, list);
-                
+                break;
                 // Removes a node in the middle of the list
             }else{
                 ListNode* node = currentNode, *previous = node->previous, *next = node->next;
@@ -146,10 +148,9 @@ void removeObject(struct List* list, void* info) {
                 node->next = NULL;
                 node->previous = NULL;
                 deleteNode(node, list);
+                break;
             }
-            
         }
-        
         // Continues iteration
         currentNode = currentNode->previous;
     }
@@ -168,6 +169,7 @@ void deleteList(struct List* list) {
     }
     /// Clears the message
     free(list);
+    list = NULL;
 }
 
 /// Searches for the object in the list and returns it(if found)
