@@ -65,7 +65,7 @@ void listContactsAndGroups() {
 void listMessagesWithContact(char* name) {
     Contact* c = searchContactWithName(name);
     if( c != NULL ) {
-        listMessagesForContact(c);
+        listMessagesForContactAndUpdateThem(c);
     }else{
         printf("Couldn't find contact with name %s\n", name);
     }

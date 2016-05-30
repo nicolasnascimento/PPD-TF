@@ -75,19 +75,30 @@ void printMessageDescription(struct Message* message) {
     printf("%s, %s, %s\n", message->owner, message->description, message->status == Read ? readMessage : receiveMessage);
 }
 /// Lists all messages with a given contac
-void listMessagesForContact(struct Contact* contact) {
-    FILE* filePointer = fopen(contact->name, "rb");
+void listMessagesForContactAndUpdateThem(struct Contact* contact) {
+    // Opens message file
+    FILE* filePointer = fopen(contact->name, "rb+");
     if( !filePointer ) {
         printf("You still don't have any messages with %s\n", contact->name);
     }else{
+        // Buffer message
         Message m;
         char clearMessage[] = "";
         while ( !feof(filePointer) ) {
             strcpy(m.description, clearMessage);
             strcpy(m.owner, clearMessage);
+            // Reads message
             fread(&m, sizeof(Message), 1, filePointer);
+            // Assures EOF isn't reached
             if( strcmp(m.owner, clearMessage) != 0 && strcmp(m.description, clearMessage) != 0 ) {
+                // Updates status
+                m.status = Read;
+                // Prints the message
                 printMessageDescription(&m);
+                // Returns file pointer so that update can be performed
+                fseek(filePointer, -sizeof(Message), SEEK_CUR);
+                // Updates to file
+                fwrite(&m, sizeof(Message), 1, filePointer);
             }
         }
     }
