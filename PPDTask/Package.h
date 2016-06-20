@@ -47,7 +47,6 @@ Package createFullPackage(PackageType type, char* description, char* senderName)
 Package createPackageForMessageReceivedFromSender(char* senderName) {
     return createFullPackage(MessageReceived, "", senderName);
 }
-
 /// Default message read package
 Package createPackageForMessageReadFromSender(char* senderName) {
     return createFullPackage(MessageRead, "", senderName);

@@ -52,10 +52,9 @@ void populateContactListFromFileWithName(struct List* list, char* fileName) {
     // Closes file
     fclose(filePointer);
 }
-/// Standard initialization
+
+/// Allocates and initializes the local user
 void allocLocalContact() {
-    // Contact
-    
     localContact.contact = allocContactFromFileWithName(localUserFileName);
     // if this file doesn't exit, the application if being run for the first time
     if( !localContact.contact ) {
@@ -102,6 +101,32 @@ Contact* searchContactWithName(char* name) {
     Contact* foundContact = searchObject(localContact.contactList, c);
     deallocContact(c);
     return foundContact;
+}
+/// Checks if all contacts in the possibleGroupComponents(contact names separated by spaces)
+int checkIfGroupComponentsAreInContactList(char* possibleGroupComponents) {
+    
+    /// A temporary pointer to the string
+    char* stringPointer = possibleGroupComponents;
+    size_t totalIncrement = 0;
+    do {
+        // Buffer to read portion of the string
+        size_t bufferLength = strlen(possibleGroupComponents);
+        char buffer[bufferLength];
+        strcpy(buffer, "");
+        sscanf(stringPointer, "%s", buffer);
+        
+        if( searchContactWithName(buffer) == NULL ) {
+            return 1;
+        }
+        
+        // Advances pointer by the amount of chars in the string
+        size_t increment = strlen(buffer) + 1; // + 1 to count the space char
+        stringPointer += increment;
+        totalIncrement += increment;
+        
+    } while ( totalIncrement < strlen(possibleGroupComponents) );
+    
+    return 0;
 }
 /// Prints local user description
 void printLocalUserDescription() {

@@ -198,6 +198,7 @@ void initClientThreadWithPackageAndIpAddress(struct Package package, char* ipAdd
     ClientData* data = malloc(sizeof(ClientData));
     
     printf("Initialization Client\n");
+    
     // Copies the data structure
     data->clientPackage = package;
     strcpy(data->ipAddress, ipAddress);
@@ -213,6 +214,11 @@ void initClientThreadWithPackageAndIpAddress(struct Package package, char* ipAdd
 void initClientThreadsForPendingPackages() {
     // Opens file to save(append binary mode)
     FILE* filePointer = fopen(pendingClientDataFileName, "rb");
+    
+    /// This means no pending message has been created
+    if( !filePointer ) {
+        return;
+    }
     
     // The buffer to be used for reading
     ClientData buffer;

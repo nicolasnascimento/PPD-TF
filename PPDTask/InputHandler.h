@@ -29,11 +29,11 @@ typedef enum InputType {
 } InputType;
 
 // Standard inputs beginning
-char insertContactCommandStandardBeginning[MAX_INPUT_SIZE] = "#i"; // #i <name> <ip>
-char insertGroupCommandStandardBeginning[MAX_INPUT_SIZE] = "#g"; // #g <name> <nameList>
-char listMessagesCommandStandardBegining[MAX_INPUT_SIZE] = "#l"; // #l <name>
-char sendMessageCommandStandardBeginning[MAX_INPUT_SIZE] = "#s"; // #s <name> <message>
-char listContactsAndGroupsCommandStandardBeginning[MAX_INPUT_SIZE] = "#c"; // #c
+char insertContactCommandStandardBeginning[MAX_INPUT_SIZE] = "#i";          // #i <name> <ip>
+char insertGroupCommandStandardBeginning[MAX_INPUT_SIZE] = "#g";            // #g <name> <nameList>
+char listMessagesCommandStandardBegining[MAX_INPUT_SIZE] = "#l";            // #l <name>
+char sendMessageCommandStandardBeginning[MAX_INPUT_SIZE] = "#s";            // #s <name> <message>
+char listContactsAndGroupsCommandStandardBeginning[MAX_INPUT_SIZE] = "#c";  // #c
 char terminateCommandStandardBeginning[MAX_INPUT_SIZE] = "#0";
 
 /// Returns the amount of spaces in a string
@@ -118,7 +118,7 @@ void adaptParserForGroupCreationWithInputString(struct Parser* parser, char* inp
         }
         i++;
     }
-    
+    parser->thirdParameter[bufferIterator] = '\0';
 }
 /// Prompts user for input and returns the provided parameters as part of the Parser Structure
 Parser askAndParseUserInput() {

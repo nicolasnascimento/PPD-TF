@@ -19,7 +19,8 @@
 #include "List.h"
 #include "Message.h"
 
-// Should allocated and initialize all resources
+// MARK - INITIALIZATION & DEINITIALIZATION
+/// Allocate and initializes all resources
 void init() {
     // Initializes the server
     initServerThread();
@@ -30,7 +31,7 @@ void init() {
     // Begins sending pending packages
     initClientThreadsForPendingPackages();
 }
-// Should clean up all used resources
+/// cleans up all used resources
 void cleanUpOnExit() {
     // Kills the server thread before terminating
     stopServerThread();
@@ -38,6 +39,8 @@ void cleanUpOnExit() {
     // Deallocates local user
     deallocLocalContact();
 }
+
+// MARK - FUNCTIONS
 /// Sends a message to the contact if it's in the contact list
 void sendMessageToContact(char* messageDescription, char* name) {
     // TODO - Improve this
@@ -65,6 +68,7 @@ void insertContactInContactList(char* name, char* ipAddress) {
 void listContactsAndGroups() {
     printLocalUserDescription();
 }
+/// Lists all messages for the given contact
 void listMessagesWithContact(char* name) {
     Contact* c = searchContactWithName(name);
     if( c != NULL ) {
@@ -73,23 +77,38 @@ void listMessagesWithContact(char* name) {
         printf("Couldn't find contact with name %s\n", name);
     }
 }
-// Main Thread Loop
-// This will provide the UI and others front-end features
+/// Inserts a group in the group list
+void insertGroupInGroupList(char* groupName, char* groupComponents) {
+    // Check if all group components are in the contact list
+    if( checkIfGroupComponentsAreInContactList(groupComponents) == 0 ) {
+        // Create group
+        
+        // Send group creation message for contacts in the group list
+        
+    }else{
+        printf("One of the components is not in you contact list\n");
+    }
+    
+}
+
+// MARK - MAIN THREAD LOOP
+// Continuoly prompts the user for input and triggers the appropiate functions
 void initMainLoop() {
     // Basic initialization
     while(1) {
         Parser parser = askAndParseUserInput();
         switch (parser.type) {
             case ListMessagesWithContact:
-                listMessagesWithContact(parser.secondParamter);
                 printf("list messages with contact\n");
+                listMessagesWithContact(parser.secondParamter);
                 break;
             case ListContactsAndGroups:
-                listContactsAndGroups();
                 printf("list contacts and groups\n");
+                listContactsAndGroups();
                 break;
             case InsertGroupInGroupList:
                 printf("insert group\n");
+                insertGroupInGroupList(parser.secondParamter, parser.thirdParameter);
                 break;
             case InsertContactInContactList:
                 printf("insert contac in contact list\n");
@@ -109,7 +128,7 @@ void initMainLoop() {
     }
 }
 
-// Main Application
+// MARK - MAIN APPLICATION
 int main(int argc, const char * argv[]) {
     /// Perform basic initialization
     init();

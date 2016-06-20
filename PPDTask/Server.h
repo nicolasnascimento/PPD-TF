@@ -159,7 +159,7 @@ void initServerThread() {
     }
 }
 
-// Destroys resources used in the server
+/// Destroys resources used in the server
 void stopServerThread() {
     
     // Kills the server thread
