@@ -47,16 +47,16 @@ int isEqualMessage(struct Message* message1, struct Message* message2) {
     }
     return 1;
 }
-/// Saves a message to a file with the name of the contact
-void saveNewMessageForContact(struct Message* message, struct Contact* contact) {
+/// Saves a message to a file named
+void saveMessageForContact(struct Message* message, char* fileName) {
     // Tries to open file
-    FILE* filePointer = fopen(contact->name, "ab");
+    FILE* filePointer = fopen(fileName, "ab");
     // This means that this is the first messsage with this contact
     if( !filePointer ) {
         // Closes file stream
         fclose(filePointer);
         // Creates the file
-        FILE* newFilePointer = fopen(contact->name, "wb");
+        FILE* newFilePointer = fopen(fileName, "wb");
         // Writes the message
         fwrite(message, sizeof(Message), 1, newFilePointer);
         // Closes file stream
@@ -67,6 +67,10 @@ void saveNewMessageForContact(struct Message* message, struct Contact* contact) 
         // Closes file stream
         fclose(filePointer);
     }
+}
+/// Saves a message to a file with the name of the contact
+void saveNewMessageForContact(struct Message* message, struct Contact* contact) {
+    saveMessageForContact(message, contact->name);
 }
 /// Prints the content of a message to stdout
 void printMessageDescription(struct Message* message) {

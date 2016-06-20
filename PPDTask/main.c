@@ -26,6 +26,9 @@ void init() {
     
     // Allocs the local contact(or creates it if needed)
     allocLocalContact();
+    
+    // Begins sending pending packages
+    initClientThreadsForPendingPackages();
 }
 // Should clean up all used resources
 void cleanUpOnExit() {

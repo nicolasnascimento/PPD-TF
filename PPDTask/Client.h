@@ -24,6 +24,12 @@
 
 #define MAX_IP_ADDRESS_LENGTH 32
 
+/// The file that holds pending data
+char pendingClientDataFileName[] = "pendingData";
+char temporaryPendingClientDataFileName[] = "temporaryPendingData";
+
+/// Avoid data racing
+pthread_mutex_t pendingFileMutex;
 
 typedef struct ClientData{
     // The package to be sent
@@ -32,12 +38,105 @@ typedef struct ClientData{
     char ipAddress[MAX_IP_ADDRESS_LENGTH];
 } ClientData;
 
+/// Equality definition for clientData structure
+int isEqualClientData(const struct ClientData* cd1, const struct ClientData* cd2) {
+    if( strcmp(cd1->ipAddress, cd2->ipAddress) == 0 && strcmp(cd1->clientPackage.description, cd2->clientPackage.description) == 0 && strcmp(cd1->clientPackage.senderName, cd2->clientPackage.senderName) == 0 && cd1->clientPackage.type == cd2->clientPackage.type ) {
+        return 0;
+    }
+    return 1;
+}
+
+/// Saves the file to a pending file, only used if a message if not sent(destination or sender is not connected)
+void savePendingClientData(const struct ClientData* clientData) {
+    // Avoid data racing
+    pthread_mutex_lock(&pendingFileMutex);
+    // Opens file to save(append binary mode)
+    FILE* filePointer = fopen(pendingClientDataFileName, "ab");
+    if( !filePointer ) {
+        fprintf(stderr, "Error while saving temporary file\n");
+    }else{
+        /// Writes data to file
+        fwrite(clientData, sizeof(ClientData), 1, filePointer);
+        
+        // Closes file stream
+        fclose(filePointer);
+    }
+    // Unlock mutex
+    pthread_mutex_unlock(&pendingFileMutex);
+}
+/// Saves the file to a pending file, only used if a message if not sent(destination or sender is not connected)
+void removePendingClientData(const struct ClientData* clientData) {
+    // Avoid data racing
+    pthread_mutex_lock(&pendingFileMutex);
+    // Opens file to read(read binary mode)
+    FILE* filePointer = fopen(pendingClientDataFileName, "rb");
+    // Opens temporary file
+    FILE* temporaryFilePointer = fopen(temporaryPendingClientDataFileName, "wb");
+    if( !filePointer || !temporaryFilePointer ) {
+        fprintf(stderr, "Error while reading file with pending data\n");
+    }else{
+        
+        // The buffer to read
+        ClientData buffer;
+
+        // Default ip address
+        const char defaultIpAddress[] = "0.0.0.0";
+        
+        // Copies only pending files to temporary file
+        while (!feof(filePointer)) {
+            // Default value for ip address
+            strcpy(buffer.ipAddress, defaultIpAddress);
+            
+            // Reads data to file
+            fread(&buffer, sizeof(ClientData), 1, filePointer);
+            
+            // Test if buffer read is the client data and if it is equal copies it to the temporary file
+            if( isEqualClientData(&buffer, clientData) != 0 && strcmp(buffer.ipAddress, defaultIpAddress) != 0 ) {
+                fwrite(&buffer, sizeof(ClientData), 1, temporaryFilePointer);
+            }
+        }
+        
+        // Closes files to open with different modes
+        fclose(filePointer);
+        fclose(temporaryFilePointer);
+        
+        // Reopens with different modes
+        filePointer = fopen(pendingClientDataFileName, "wb");
+        temporaryFilePointer = fopen(temporaryPendingClientDataFileName, "rb");
+        
+        // Copies temporary file to pending file
+        while (!feof(temporaryFilePointer)) {
+            // Default value for ip address
+            strcpy(buffer.ipAddress, defaultIpAddress);
+            
+            // Writes data to file
+            fread(&buffer, sizeof(ClientData), 1, temporaryFilePointer);
+            
+            // Test if buffer read is not empty
+            if( strcmp(buffer.ipAddress, defaultIpAddress) != 0 ) {
+                fwrite(&buffer, sizeof(ClientData), 1, filePointer);
+            }
+        }
+        
+        
+        // Closes file streams
+        fclose(filePointer);
+        fclose(temporaryFilePointer);
+    }
+    // Unlock mutex
+    pthread_mutex_unlock(&pendingFileMutex);
+}
+
 
 // This is the client function
 // It sends a message using the reference socket in the global communicator
 void* clientFunction(void* data) {
     // The data to be passed
     ClientData* clientData = ((ClientData*)data);
+    
+    // Saves data to avoid never sending it
+    savePendingClientData(clientData);
+    
     // A reference 
     int socketReference;
     
@@ -75,6 +174,9 @@ void* clientFunction(void* data) {
     // Sends the message
     send(socketReference, &clientData->clientPackage, sizeof(Package), 0);
     
+    // Removes previously saved client data(send() assures it was sent)
+    removePendingClientData(clientData);
+    
     // Deallocates data
     free(clientData);
     clientData = NULL;
@@ -87,6 +189,9 @@ void initClientThreadWithPackageAndIpAddress(struct Package package, char* ipAdd
     
     // The thread to serve as the client
     pthread_t clientThread;
+    
+    // Pending File Mutex Initialization
+    pthread_mutex_init(&pendingFileMutex, NULL);
     
     // Dynamic allocation to assure data persistance
     // The sending thread hass to free this memory
@@ -101,6 +206,32 @@ void initClientThreadWithPackageAndIpAddress(struct Package package, char* ipAdd
     if( pthread_create(&clientThread, NULL, clientFunction, data)) {
         fprintf(stderr, "Error while creating client thread, aborting");
         return;
+    }
+}
+
+/// Creates a sending thread for each pending package
+void initClientThreadsForPendingPackages() {
+    // Opens file to save(append binary mode)
+    FILE* filePointer = fopen(pendingClientDataFileName, "rb");
+    
+    // The buffer to be used for reading
+    ClientData buffer;
+    
+    // Default ip address
+    const char defaultIpAddress[] = "0.0.0.0";
+    
+    // Copies only pending files to temporary file
+    while (!feof(filePointer)) {
+        // Default value for ip address
+        strcpy(buffer.ipAddress, defaultIpAddress);
+        
+        // Reads data to file
+        fread(&buffer, sizeof(ClientData), 1, filePointer);
+        
+        if( strcmp(buffer.ipAddress, defaultIpAddress) != 0 ) {
+            /// Creates the sending thread
+            initClientThreadWithPackageAndIpAddress(buffer.clientPackage, buffer.ipAddress);
+        }
     }
 }
 
