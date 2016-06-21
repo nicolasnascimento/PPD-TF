@@ -12,8 +12,8 @@
 #include <string.h>
 #include <stdio.h>
 
-#include "Package.h"
 #include "Contact.h"
+#include "Package.h"
 
 /// The possible status
 typedef enum MessageStatus {
@@ -48,7 +48,7 @@ int isEqualMessage(struct Message* message1, struct Message* message2) {
     return 1;
 }
 /// Saves a message to a file named
-void saveMessageForContact(struct Message* message, char* fileName) {
+void saveMessageForContact(const struct Message* message, const char* fileName) {
     // Tries to open file
     FILE* filePointer = fopen(fileName, "ab");
     // This means that this is the first messsage with this contact
@@ -69,7 +69,7 @@ void saveMessageForContact(struct Message* message, char* fileName) {
     }
 }
 /// Saves a message to a file with the name of the contact
-void saveNewMessageForContact(struct Message* message, struct Contact* contact) {
+void saveNewMessageForContact(const struct Message* message, const struct Contact* contact) {
     saveMessageForContact(message, contact->name);
 }
 /// Prints the content of a message to stdout

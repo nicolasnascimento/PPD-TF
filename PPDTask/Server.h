@@ -23,10 +23,8 @@
 #include <pthread.h>
 
 #include "LocalContact.h"
-#include "Package.h"
 #include "Contact.h"
 #include "Message.h"
-
 
 // The thread to serve as the server
 pthread_t serverThread;
@@ -47,7 +45,9 @@ void* backgroundFunction(void* data) {
     Contact* contact = searchContactWithName(serverData->originalPackage.senderName);
     if( contact == NULL ) {
         printf("Couldn't find contact %s in contact list, aborting\n", serverData->originalPackage.senderName);
-        return NULL;
+        if(serverData->originalPackage.type != GroupCreation) {
+            return NULL;
+        }
     }
     
     // Treat all package cases, first locally
@@ -66,6 +66,10 @@ void* backgroundFunction(void* data) {
             printf("\n");
             Message messageDescription = createMessageForOwnerWithDescription(serverData->originalPackage.senderName, serverData->originalPackage.description);
             saveNewMessageForContact(&messageDescription, contact);
+            break;
+        case GroupCreation:
+            printf("\n");
+            printf("Implement group creation");
             break;
     }
     

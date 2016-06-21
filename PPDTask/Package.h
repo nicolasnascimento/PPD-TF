@@ -10,6 +10,7 @@
 #define Package_h
 
 #include <stdio.h>
+#include "Contact.h"
 
 #define MAX_DESCRIPTION_SIZE 32
 
@@ -17,27 +18,31 @@
 typedef enum PackageType {
     MessageDescription,
     MessageReceived,
-    MessageRead
+    MessageRead,
+    GroupCreation
 } PackageType;
 
 /// The standard package
 typedef struct Package {
-    // This will be set if package if of type "MessageDescription"
+    // This can suit different purposes depending on the 'type' property of the package
     char description[MAX_DESCRIPTION_SIZE];
     // The name of the sender
     char senderName[MAX_DESCRIPTION_SIZE];
     // The type of package
     PackageType type;
+    // Group specific properties
+    Contact groupContact;
 } Package;
 
 /// Creates a new package with the given parameters
-Package createFullPackage(PackageType type, char* description, char* senderName) {
+Package createFullPackage(PackageType type, const char* description, const char* senderName, const Contact* contact) {
     if( strlen(description) > MAX_DESCRIPTION_SIZE || strlen(senderName) > MAX_DESCRIPTION_SIZE ) {
         fprintf(stderr, "Cannot create package for description with length %lu", strlen(description));
         exit(EXIT_FAILURE);
     }else{
         Package p;
         p.type = type;
+        p.groupContact = *contact;
         strcpy(p.senderName, senderName);
         strcpy(p.description, description);
         return p;
@@ -45,20 +50,20 @@ Package createFullPackage(PackageType type, char* description, char* senderName)
 }
 /// Default message received package
 Package createPackageForMessageReceivedFromSender(char* senderName) {
-    return createFullPackage(MessageReceived, "", senderName);
+    return createFullPackage(MessageReceived, "", senderName, NULL);
 }
 /// Default message read package
 Package createPackageForMessageReadFromSender(char* senderName) {
-    return createFullPackage(MessageRead, "", senderName);
+    return createFullPackage(MessageRead, "", senderName, NULL);
 }
 /// Default message description package
 Package createPackageForMessageDescriptionFromSender(char* description, char* senderName) {
-    return createFullPackage(MessageDescription, description, senderName);
+    return createFullPackage(MessageDescription, description, senderName, NULL);
 }
 /// Allocates a new package using a static package as parameter
 Package* allocPackageWithPackage(struct Package package) {
     Package* p = malloc(sizeof(Package));
-    *p = createFullPackage(package.type, package.description, package.senderName);
+    *p = createFullPackage(package.type, package.description, package.senderName, package.type == GroupCreation ? &(package.groupContact) : NULL );
     return p;
 }
 

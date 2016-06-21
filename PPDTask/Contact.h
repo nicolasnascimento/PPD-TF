@@ -12,16 +12,15 @@
 #include <stdio.h>
 #include <string.h>
 
-#include "Client.h"
-
 #define MAX_NAME_LENGTH 32
+#define MAX_IP_LENGTH 32
 
 /// Defines a standard contact data structure
 typedef struct Contact {
     // The name of the contact
     char name[MAX_NAME_LENGTH];
     // The ip address for this contac
-    char ipAddress[MAX_IP_ADDRESS_LENGTH];
+    char ipAddress[MAX_IP_LENGTH];
 } Contact;
 
 /// Creates a contact using the given parameters
@@ -70,6 +69,21 @@ void saveContact(struct Contact* contact) {
     
     // Closes stream
     fclose(filePointer);
+}
+// Returns 0 if contact is a group and not a regular contact
+int contactIsGroup(const struct Contact* contact) {
+    // Formatted string
+    char formatedGroupName[strlen(contact->name + 1)];
+    strcpy(formatedGroupName, "*");
+    strcat(formatedGroupName, contact->name);
+    
+    // Tries to open file with the group data
+    FILE* filePointer = fopen(formatedGroupName, "r");
+    if( !filePointer ) {
+        return 1; // Not a group
+    }
+    fclose(filePointer);
+    return 0;
 }
 Contact* allocContactFromFileWithName(char* fileName) {
     Contact c;

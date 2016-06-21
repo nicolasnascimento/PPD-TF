@@ -16,6 +16,8 @@
 #include "Contact.h"
 #include "InputHandler.h"
 #include "List.h"
+#include "Message.h"
+#include "Client.h"
 
 /// Structure for the local contact
 typedef struct LocalContact{
@@ -102,6 +104,55 @@ Contact* searchContactWithName(char* name) {
     deallocContact(c);
     return foundContact;
 }
+/// Sends a group creation message to the given contact
+void sendGroupCreationMessageWithMessageDescriptionAndContact(const char* messageDescription, const struct Contact* contact) {
+    // Creates the package and the message
+    Package package = createFullPackage(GroupCreation, messageDescription, localContact.contact->name, contact);
+    // Creates the client thread to send the message
+    initClientThreadWithPackageAndIpAddress(package, contact->ipAddress);
+}
+/// Sends a regular message to the given contact
+void sendRegularMessageWithMessageDescriptionAndContact(char* messageDescription, const struct Contact* contact) {
+    // Creates the package and the message
+    Package package = createPackageForMessageDescriptionFromSender(messageDescription, localContact.contact->name);
+    Message message = createMessageForOwnerWithDescription(localContact.contact->name, messageDescription);
+    // Saves locally before propagating
+    saveNewMessageForContact(&message, contact);
+    // Creates the client thread to send the message
+    initClientThreadWithPackageAndIpAddress(package, contact->ipAddress);
+}
+/// Sends a group creation message to a given contact
+void sendGroupCreationPackageWithGroupName(const char* groupName) {
+    // Formatted name
+    char formatedGroupName[strlen(groupName + 1)];
+    strcpy(formatedGroupName, "*");
+    strcat(formatedGroupName, groupName);
+    
+    // Opens file with the list of names
+    FILE* filePointer = fopen(formatedGroupName, "r");
+    if( !filePointer ) {
+        fprintf(stderr, "Couldn't open fileNamed: %s\n", formatedGroupName);
+    }else{
+        // Buffer to read file
+        char buffer[MAX_NAME_LENGTH] = "";
+        do {
+            // Reads string from file
+            strcpy(buffer, "");
+            fscanf(filePointer, "%s", buffer);
+            // Assures EOF is not reached
+            if( strcmp(buffer, "") != 0 ) {
+                // Finds contact with the given name
+                Contact *c = searchContactWithName(buffer);
+                if( c != NULL ) {
+                    sendGroupCreationMessageWithMessageDescriptionAndContact(groupName, c);
+                }else{
+                    fprintf(stderr, "Couldn't find contact with name %s\n", buffer);
+                }
+            }
+        } while (!feof(filePointer));
+    }
+}
+
 /// Checks if all contacts in the possibleGroupComponents(contact names separated by spaces)
 int checkIfGroupComponentsAreInContactList(char* possibleGroupComponents) {
     
@@ -130,11 +181,11 @@ int checkIfGroupComponentsAreInContactList(char* possibleGroupComponents) {
     return 0;
 }
 /// Returns a list data structure using the provided space separated string as reference
-List* allocStringListWithSpaceSeparetedString(char* string) {
+List* allocStringListWithSpaceSeparetedString(const char* string) {
     List* list = newSimpleObjectList((comparatorFunction)strcmp);
     
     /// A temporary pointer to the string
-    char* stringPointer = string;
+    const char* stringPointer = string;
     size_t totalIncrement = 0;
     do {
         // Buffer to read portion of the string
@@ -176,11 +227,12 @@ void saveGroupComponentNameToFile(void* info) {
     }
 }
 /// Creates a contact in the list of contact of the local contact, marking it as a group
-void createGroupWithGroupNameAndComponents(char* groupName, char* groupComponents) {
+void createGroupWithGroupNameAndComponents(const char* groupName,const char* groupComponents) {
     // Formated name
-    char formatedGroupName[strlen(groupName + 1)];
+    char formatedGroupName[strlen(groupName + 2)]; // '*' and '\0'
     strcpy(formatedGroupName, "*");
     strcat(formatedGroupName, groupName);
+    
     // Contact Creation
     Contact* c = allocContacWithNameAndIpAddress(formatedGroupName, "0.0.0.0"); // This ipAddress shall not be used
     appendObject(localContact.contactList, c);
@@ -189,6 +241,19 @@ void createGroupWithGroupNameAndComponents(char* groupName, char* groupComponent
     List* nameList = allocStringListWithSpaceSeparetedString(groupComponents);
     forEachObjectInList(nameList, saveGroupComponentNameToFile);
     deleteList(nameList);
+    
+    // Formated data file
+    char formatedGroupDataFileName[strlen(groupName + 2)]; // '@' and '\0'
+    strcpy(formatedGroupDataFileName, "@");
+    strcat(formatedGroupDataFileName, groupName);
+    
+    // Creates the file
+    FILE* filePointer = fopen(formatedGroupDataFileName, "w");
+    if( !filePointer ) {
+        fprintf(stderr, "Error while creating group data file: %s\n",formatedGroupDataFileName);
+    }else{
+        fclose(filePointer);
+    }
 }
 /// Prints local user description
 void printLocalUserDescription() {

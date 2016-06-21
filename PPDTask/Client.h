@@ -19,8 +19,8 @@
 #include <pthread.h>
 #include <errno.h>
 
-#include "Package.h"
 #include "Server.h"
+#include "Package.h"
 
 #define MAX_IP_ADDRESS_LENGTH 32
 
@@ -185,7 +185,7 @@ void* clientFunction(void* data) {
 }
 
 /// Initializes resources for client thread
-void initClientThreadWithPackageAndIpAddress(struct Package package, char* ipAddress) {
+void initClientThreadWithPackageAndIpAddress(const struct Package package, const char* ipAddress) {
     
     // The thread to serve as the client
     pthread_t clientThread;
