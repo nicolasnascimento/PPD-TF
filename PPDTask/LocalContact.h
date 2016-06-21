@@ -115,6 +115,8 @@ int checkIfGroupComponentsAreInContactList(char* possibleGroupComponents) {
         strcpy(buffer, "");
         sscanf(stringPointer, "%s", buffer);
         
+        // If this is true, one contact is not in contact list
+        // Thus the group creation cannot happen
         if( searchContactWithName(buffer) == NULL ) {
             return 1;
         }
@@ -125,8 +127,68 @@ int checkIfGroupComponentsAreInContactList(char* possibleGroupComponents) {
         totalIncrement += increment;
         
     } while ( totalIncrement < strlen(possibleGroupComponents) );
-    
     return 0;
+}
+/// Returns a list data structure using the provided space separated string as reference
+List* allocStringListWithSpaceSeparetedString(char* string) {
+    List* list = newSimpleObjectList((comparatorFunction)strcmp);
+    
+    /// A temporary pointer to the string
+    char* stringPointer = string;
+    size_t totalIncrement = 0;
+    do {
+        // Buffer to read portion of the string
+        size_t bufferLength = strlen(string);
+        char buffer[bufferLength];
+        strcpy(buffer, "");
+        sscanf(stringPointer, "%s", buffer);
+        
+        // Dynamic copy and adds to the list
+        char* dynamicString = malloc(sizeof(char)*(strlen(buffer) + 1)); // + 1 for the \0 char
+        strcpy(dynamicString, buffer);
+        appendObject(list, dynamicString);
+        
+        // Advances pointer by the amount of chars in the string
+        size_t increment = strlen(buffer) + 1; // + 1 to count the space char
+        stringPointer += increment;
+        totalIncrement += increment;
+        
+    } while ( totalIncrement < strlen(string) );
+    
+    return list;
+}
+/// Saves a group component name to a file(using last added contact name as file name)
+void saveGroupComponentNameToFile(void* info) {
+    // Casts info and retrieves last contact
+    char* string = (char*)info;
+    Contact* lastContact = localContact.contactList->lastNode->info;
+    
+    // Opens file
+    FILE* filePointer = fopen(lastContact->name, "a");
+    if( !filePointer ) {
+        fprintf(stderr, "Error while openning/creating group file %s\n",lastContact->name);
+    }else{
+        // Writes the data to the file
+        fprintf(filePointer, " %s ",string);
+        
+        // Closes file stream
+        fclose(filePointer);
+    }
+}
+/// Creates a contact in the list of contact of the local contact, marking it as a group
+void createGroupWithGroupNameAndComponents(char* groupName, char* groupComponents) {
+    // Formated name
+    char formatedGroupName[strlen(groupName + 1)];
+    strcpy(formatedGroupName, "*");
+    strcat(formatedGroupName, groupName);
+    // Contact Creation
+    Contact* c = allocContacWithNameAndIpAddress(formatedGroupName, "0.0.0.0"); // This ipAddress shall not be used
+    appendObject(localContact.contactList, c);
+    
+    // Save name list to file
+    List* nameList = allocStringListWithSpaceSeparetedString(groupComponents);
+    forEachObjectInList(nameList, saveGroupComponentNameToFile);
+    deleteList(nameList);
 }
 /// Prints local user description
 void printLocalUserDescription() {

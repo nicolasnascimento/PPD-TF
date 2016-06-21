@@ -13,7 +13,7 @@
 #include <stdlib.h>
 
 /// The function that tells wheter and object is equal to another
-typedef int(*comparatorFunction)(void*,void*);
+typedef int(*comparatorFunction)(const void*,const void*);
 
 // if this is defined, that it will get called and should deallocate "info", else when simply calls free passing info as parameters
 typedef void(*deleteInfoFunction)(void*);

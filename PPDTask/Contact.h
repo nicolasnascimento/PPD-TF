@@ -43,7 +43,7 @@ void deallocContact(void* contact) {
     contact = NULL;
 }
 /// Equality Definition
-int isEqualContact(void* info1, void* info2) {
+int isEqualContact(const void* info1, const void* info2) {
     Contact* c1 = (Contact*)info1;
     Contact* c2 = (Contact*)info2;
     return strcmp(c1->name, c2->name);

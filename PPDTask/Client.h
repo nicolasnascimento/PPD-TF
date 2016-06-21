@@ -190,9 +190,6 @@ void initClientThreadWithPackageAndIpAddress(struct Package package, char* ipAdd
     // The thread to serve as the client
     pthread_t clientThread;
     
-    // Pending File Mutex Initialization
-    pthread_mutex_init(&pendingFileMutex, NULL);
-    
     // Dynamic allocation to assure data persistance
     // The sending thread hass to free this memory
     ClientData* data = malloc(sizeof(ClientData));
@@ -214,6 +211,9 @@ void initClientThreadWithPackageAndIpAddress(struct Package package, char* ipAdd
 void initClientThreadsForPendingPackages() {
     // Opens file to save(append binary mode)
     FILE* filePointer = fopen(pendingClientDataFileName, "rb");
+    
+    // Pending File Mutex Initialization
+    pthread_mutex_init(&pendingFileMutex, NULL);
     
     /// This means no pending message has been created
     if( !filePointer ) {

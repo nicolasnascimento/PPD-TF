@@ -82,13 +82,12 @@ void insertGroupInGroupList(char* groupName, char* groupComponents) {
     // Check if all group components are in the contact list
     if( checkIfGroupComponentsAreInContactList(groupComponents) == 0 ) {
         // Create group
-        
+        createGroupWithGroupNameAndComponents(groupName, groupComponents);
         // Send group creation message for contacts in the group list
         
     }else{
         printf("One of the components is not in you contact list\n");
     }
-    
 }
 
 // MARK - MAIN THREAD LOOP
