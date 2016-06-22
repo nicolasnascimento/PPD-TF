@@ -109,7 +109,7 @@ void sendGroupCreationMessageWithMessageDescriptionAndContact(const char* messag
     // Creates the package and the message
     Package package = createFullPackage(GroupCreation, messageDescription, localContact.contact->name, contact);
     // Creates the client thread to send the message
-    initClientThreadWithPackageAndIpAddress(package, contact->ipAddress);
+    initClientThreadWithPackageAndIpAddress(package, contact->ipAddress, 1);
 }
 /// Sends a regular message to the given contact
 void sendRegularMessageWithMessageDescriptionAndContact(char* messageDescription, const struct Contact* contact) {
@@ -119,7 +119,7 @@ void sendRegularMessageWithMessageDescriptionAndContact(char* messageDescription
     // Saves locally before propagating
     saveNewMessageForContact(&message, contact);
     // Creates the client thread to send the message
-    initClientThreadWithPackageAndIpAddress(package, contact->ipAddress);
+    initClientThreadWithPackageAndIpAddress(package, contact->ipAddress, 1);
 }
 /// Sends a group creation message to a given contact
 void sendGroupCreationPackageWithGroupName(const char* groupName) {

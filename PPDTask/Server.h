@@ -7,7 +7,7 @@
 //
 
 #ifndef SERVER_PORT
-#define SERVER_PORT 12347
+#define SERVER_PORT 12351
 #endif
 
 #ifndef Server_h
@@ -135,7 +135,6 @@ void* serverLoop() {
     // Package
     Package package;
     
-    
     // Creates the socket
     socketReference = socket(AF_INET, SOCK_STREAM, 0);
     if( socketReference < 0 ) {
@@ -150,7 +149,7 @@ void* serverLoop() {
     
     // binds socket and sockaddr_in structures
     if( bind(socketReference, (struct sockaddr *)&server, sizeof(server) ) < 0) {
-        fprintf(stderr, "Error while binding stream socket");
+        fprintf(stderr, "Error while binding stream socket\n");
         return NULL;
     }
     

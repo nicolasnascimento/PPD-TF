@@ -15,6 +15,8 @@
 #include <sys/types.h>
 #include <netinet/in.h>
 #include <netdb.h>
+#include <sched.h>
+#include <unistd.h>
 #include <arpa/inet.h>
 #include <pthread.h>
 #include <errno.h>
@@ -36,6 +38,8 @@ typedef struct ClientData{
     Package clientPackage;
     // The server ip address
     char ipAddress[MAX_IP_ADDRESS_LENGTH];
+    // A flag to indicate wheter a pending package should be created in the pending list
+    int shouldCreatePendingDataFile;
 } ClientData;
 
 /// Equality definition for clientData structure
@@ -149,14 +153,14 @@ void* clientFunction(void* data) {
     
     // Error check
     if (socketReference  < 0) {
-        fprintf(stderr,"Error opening stream socket.");
+        fprintf(stderr,"Error opening stream socket.\n");
         return NULL;
     }
     
     // Parses ip Address
     hp = gethostbyname(clientData->ipAddress);
     if (hp == 0) {
-        fprintf(stderr,"%s: Unknown host",clientData->ipAddress);
+        fprintf(stderr,"%s: Unknown host\n",clientData->ipAddress);
         return NULL;
     }
     
@@ -165,10 +169,26 @@ void* clientFunction(void* data) {
     //server.sin_port = SERVER_PORT;
     server.sin_port = SERVER_PORT;
     
-    // Stabilishes the connection
-    if(connect(socketReference, (struct sockaddr *)&server, sizeof server) < 0) {
-        fprintf(stderr,"Error %d while connecting stream socket\n", errno);
-        return NULL;
+    // Tries to stabilishes the connection
+    while(connect(socketReference, (struct sockaddr *)&server, sizeof server) < 0) {
+        
+        // Debug message
+        fprintf(stderr, "Couldn't connect, trying again in 5 seconds\n");
+        
+        // Waits 5 seconds
+        sleep(5);
+        
+        // Closes the failed socket
+        close(socketReference);
+        
+        // Recreates
+        socketReference = socket(AF_INET, SOCK_STREAM, 0);
+        
+        // Error check
+        if (socketReference  < 0) {
+            fprintf(stderr,"Error opening stream socket.");
+            return NULL;
+        }
     }
     
     // Sends the message
@@ -185,7 +205,7 @@ void* clientFunction(void* data) {
 }
 
 /// Initializes resources for client thread
-void initClientThreadWithPackageAndIpAddress(const struct Package package, const char* ipAddress) {
+void initClientThreadWithPackageAndIpAddress(const struct Package package, const char* ipAddress, int createPendingData) {
     
     // The thread to serve as the client
     pthread_t clientThread;
@@ -199,6 +219,7 @@ void initClientThreadWithPackageAndIpAddress(const struct Package package, const
     // Copies the data structure
     data->clientPackage = package;
     strcpy(data->ipAddress, ipAddress);
+    data->shouldCreatePendingDataFile = createPendingData;
     
     // Initializes the thread to send data
     if( pthread_create(&clientThread, NULL, clientFunction, data)) {
@@ -236,7 +257,7 @@ void initClientThreadsForPendingPackages() {
         
         if( strcmp(buffer.ipAddress, defaultIpAddress) != 0 ) {
             /// Creates the sending thread
-            initClientThreadWithPackageAndIpAddress(buffer.clientPackage, buffer.ipAddress);
+            initClientThreadWithPackageAndIpAddress(buffer.clientPackage, buffer.ipAddress, 0);
         }
     }
 }
