@@ -87,12 +87,6 @@ Contact* allocContactFromFileWithName(char* fileName) {
     fclose(filePointer);
     return allocContacWithNameAndIpAddress(c.name, c.ipAddress);
 }
-/// Prints a description for the contact
-void printDescriptionForContact(struct Contact* contact) {
-    printf("Name: %s, ipAddress: %s\n", contact->name, contact->ipAddress);
-}
-
-// MARK - GROUP FUNCTIONS
 /// Returns 0 if contact is a group and not a regular contact
 int contactIsGroup(const struct Contact* contact) {
     // Formatted string
@@ -108,6 +102,43 @@ int contactIsGroup(const struct Contact* contact) {
     fclose(filePointer);
     return 0;
 }
+/// Prints a description for the contact
+void printDescriptionForContact(struct Contact* contact) {
+    // Group printing should be performed differently
+    if( contactIsGroup(contact) == 0 ) {
+        // Opens name list file
+        FILE* filePointer = fopen(contact->name, "r");
+        if( !filePointer ) {
+            fprintf(stderr, "Error while opening stream for group %s\n", contact->name);
+        }else{
+            // Buffer to read from file
+            char buffer[MAX_NAME_LENGTH] = "";
+            while (!feof(filePointer)) {
+                // Assures buffer is empty
+                strcpy(buffer, "");
+                
+                // Reads name from file
+                fscanf(filePointer, "%s", buffer);
+                
+                // Assures a string has been read
+                if( strcmp(buffer, "") != 0 ) {
+                    
+                    // TODO - Fix this
+                    Contact *c = allocContacWithNameAndIpAddress(buffer, "Grouped");
+                    printDescriptionForContact(c);
+                    deallocContact(c);
+                }
+            }
+            
+            //Closes file stream
+            fclose(filePointer);
+        }
+    // Regular Contact
+    }else {
+        printf("Name: %s, ipAddress: %s\n", contact->name, contact->ipAddress);
+    }
+    
+}
 ///// Dynamic allocates the group name using the original name(without the '*')
 //char* allocFormattedGroupNameStringWithOriginalName(char* originalName) {
 //    char* formatedGroupName = calloc(strlen(originalName) + 1, sizeof(char));
@@ -115,6 +146,5 @@ int contactIsGroup(const struct Contact* contact) {
 //    strcat(formatedGroupName, originalName);
 //    return formatedGroupName;
 //}
-
 
 #endif /* Contact_h */

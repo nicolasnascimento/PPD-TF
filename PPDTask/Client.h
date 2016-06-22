@@ -227,7 +227,16 @@ void initClientThreadWithPackageAndIpAddress(const struct Package package, const
         return;
     }
 }
-
+/// Performs basic initialization for variables in the client-side
+void initClientThread() {
+    // Pending file mutex initialization
+    pthread_mutex_init(&pendingFileMutex, NULL);
+}
+/// Performs basic deinitialization for variables in the client-side
+void stopClientThread() {
+    // Pending file mutex destruction
+    pthread_mutex_destroy(&pendingFileMutex);
+}
 /// Creates a sending thread for each pending package
 void initClientThreadsForPendingPackages() {
     // Opens file to save(append binary mode)

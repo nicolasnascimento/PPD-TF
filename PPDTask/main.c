@@ -22,14 +22,20 @@ void init() {
     // Allocs the local contact(or creates it if needed)
     allocLocalContact();
     
+    // Initializes the client
+    initClientThread();
+    
     // Begins sending pending packages
     initClientThreadsForPendingPackages();
 }
 
-/// cleans up all used resources
+/// Cleans up all used resources
 void cleanUpOnExit() {
     // Kills the server thread before terminating
     stopServerThread();
+    
+    // Kills the client mutex and terminates all sockets
+    stopClientThread();
     
     // Deallocates local user
     deallocLocalContact();

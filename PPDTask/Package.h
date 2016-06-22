@@ -10,6 +10,7 @@
 #define Package_h
 
 #include <stdio.h>
+
 #include "Contact.h"
 
 #define MAX_DESCRIPTION_SIZE 32

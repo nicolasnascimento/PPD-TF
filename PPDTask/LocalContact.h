@@ -13,7 +13,6 @@
 #include <string.h>
 #include <arpa/inet.h>
 
-#include "Contact.h"
 #include "InputHandler.h"
 #include "List.h"
 #include "Message.h"
@@ -97,7 +96,8 @@ void deallocLocalContact() {
     deallocContact(localContact.contact);
     deleteList(localContact.contactList);
 }
-/// Seach contac in contact list
+
+/// Seach contact in contact list
 Contact* searchContactWithName(char* name) {
     Contact* c = allocContacWithNameAndIpAddress(name, "0.0.0.0"); // name will be used for comparasion
     Contact* foundContact = searchObject(localContact.contactList, c);
