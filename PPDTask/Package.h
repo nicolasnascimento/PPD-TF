@@ -42,9 +42,11 @@ Package createFullPackage(PackageType type, const char* description, const char*
     }else{
         Package p;
         p.type = type;
-        p.groupContact = *contact;
         strcpy(p.senderName, senderName);
         strcpy(p.description, description);
+        if( contact != NULL ) {
+            p.groupContact = *contact;
+        }
         return p;
     }
 }

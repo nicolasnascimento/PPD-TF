@@ -25,6 +25,7 @@ void init() {
     // Begins sending pending packages
     initClientThreadsForPendingPackages();
 }
+
 /// cleans up all used resources
 void cleanUpOnExit() {
     // Kills the server thread before terminating

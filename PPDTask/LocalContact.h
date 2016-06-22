@@ -124,7 +124,7 @@ void sendRegularMessageWithMessageDescriptionAndContact(char* messageDescription
 /// Sends a group creation message to a given contact
 void sendGroupCreationPackageWithGroupName(const char* groupName) {
     // Formatted name
-    char formatedGroupName[strlen(groupName + 1)];
+    char formatedGroupName[strlen(groupName) + 2];
     strcpy(formatedGroupName, "*");
     strcat(formatedGroupName, groupName);
     
@@ -208,16 +208,13 @@ List* allocStringListWithSpaceSeparetedString(const char* string) {
     
     return list;
 }
-/// Saves a group component name to a file(using last added contact name as file name)
-void saveGroupComponentNameToFile(void* info) {
-    // Casts info and retrieves last contact
+/// Saves a group component name to a fileNamed
+void appendGroupComponentNameToFileNamed(void* info, char* fileName) {
     char* string = (char*)info;
-    Contact* lastContact = localContact.contactList->lastNode->info;
-    
     // Opens file
-    FILE* filePointer = fopen(lastContact->name, "a");
+    FILE* filePointer = fopen(fileName, "a");
     if( !filePointer ) {
-        fprintf(stderr, "Error while openning/creating group file %s\n",lastContact->name);
+        fprintf(stderr, "Error while openning/creating group file %s\n",fileName);
     }else{
         // Writes the data to the file
         fprintf(filePointer, " %s ",string);
@@ -226,10 +223,14 @@ void saveGroupComponentNameToFile(void* info) {
         fclose(filePointer);
     }
 }
+/// Calls saveGroupComponentNameToFileNamed() providing last contact name as the file name
+void appendGroupComponentNameToLastContactFile(void* info) {
+    appendGroupComponentNameToFileNamed(info, localContact.contact->name);
+}
 /// Creates a contact in the list of contact of the local contact, marking it as a group
 void createGroupWithGroupNameAndComponents(const char* groupName,const char* groupComponents) {
     // Formated name
-    char formatedGroupName[strlen(groupName + 2)]; // '*' and '\0'
+    char formatedGroupName[strlen(groupName) + 2]; // '*' and '\0'
     strcpy(formatedGroupName, "*");
     strcat(formatedGroupName, groupName);
     
@@ -239,7 +240,7 @@ void createGroupWithGroupNameAndComponents(const char* groupName,const char* gro
     
     // Save name list to file
     List* nameList = allocStringListWithSpaceSeparetedString(groupComponents);
-    forEachObjectInList(nameList, saveGroupComponentNameToFile);
+    forEachObjectInList(nameList, appendGroupComponentNameToLastContactFile);
     deleteList(nameList);
     
     // Formated data file

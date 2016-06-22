@@ -54,22 +54,44 @@ void* backgroundFunction(void* data) {
     switch (serverData->originalPackage.type) {
         case MessageReceived:
             printf("\n");
+            // Creates and updates status for message
             Message messageReceived = createMessageForOwnerWithDescription(serverData->originalPackage.senderName, serverData->originalPackage.description);
             updateMessageStatusForContactWithMessageStatus(&messageReceived, contact, Received);
             break;
         case MessageRead:
             printf("\n");
+            // Creates and updates status for message
             Message messageRead = createMessageForOwnerWithDescription(serverData->originalPackage.senderName, serverData->originalPackage.description);
             updateMessageStatusForContactWithMessageStatus(&messageRead, contact, Read);
             break;
         case MessageDescription:
             printf("\n");
+            // Creates and saves a message for the first reception
             Message messageDescription = createMessageForOwnerWithDescription(serverData->originalPackage.senderName, serverData->originalPackage.description);
             saveNewMessageForContact(&messageDescription, contact);
             break;
         case GroupCreation:
             printf("\n");
-            printf("Implement group creation");
+            // If group contact is not in contact list, add it as contact
+            if( searchContactWithName(serverData->originalPackage.groupContact.name) == NULL ) {
+                Contact* c = allocContacWithNameAndIpAddress(serverData->originalPackage.groupContact.name, serverData->originalPackage.groupContact.ipAddress);
+                appendObject(localContact.contactList, c);
+                contact = c;
+            }
+            // Formatted name
+            char formatedGroupName[strlen(serverData->originalPackage.description) + 2];
+            strcpy(formatedGroupName, "*");
+            strcat(formatedGroupName, contact->name);
+            
+            // If group is already in contact list, simply append the new contact
+            if( searchContactWithName(formatedGroupName) == NULL ) {
+                appendGroupComponentNameToFileNamed(contact->name, formatedGroupName);
+            // else create the group
+            }else{
+                createGroupWithGroupNameAndComponents(serverData->originalPackage.description, contact->name);
+            }
+            
+            //printf("Implement group creation");
             break;
     }
     
@@ -113,6 +135,7 @@ void* serverLoop() {
     // Package
     Package package;
     
+    
     // Creates the socket
     socketReference = socket(AF_INET, SOCK_STREAM, 0);
     if( socketReference < 0 ) {
@@ -145,7 +168,6 @@ void* serverLoop() {
         // Avoid blocking server for too long, use a background thread
         createBackgroundThreadToHandlePackageWithSocketReference(package, socketReference);
     }
-    
     return NULL;
 }
 

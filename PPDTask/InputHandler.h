@@ -77,7 +77,7 @@ InputType getInputTypeFromString(char* string, struct Parser* parser) {
             return InsertGroupInGroupList;
         } else if( strcmp(command, listMessagesCommandStandardBegining) == 0 && amountOfSpacesInString(string) == 1 ) {
             return ListMessagesWithContact;
-        } else if( strcmp(command, sendMessageCommandStandardBeginning) == 0 && amountOfSpacesInString(string) == 2 ) {
+        } else if( strcmp(command, sendMessageCommandStandardBeginning) == 0 && amountOfSpacesInString(string) >= 2 ) {
             return SendMessageToContact;
         } else if( strcmp(command, listContactsAndGroupsCommandStandardBeginning) == 0 ) {
             return ListContactsAndGroups;
@@ -104,7 +104,7 @@ char* getStringFromStdin() {
     return inputString;
 }
 /// All names for the group will be stored in the third parameter string
-void adaptParserForGroupCreationWithInputString(struct Parser* parser, char* inputString) {
+void joinThirdParamaterForParserWithInputString(struct Parser* parser, char* inputString) {
     strcpy(parser->thirdParameter, "");
     int i = 0;
     int bufferIterator = 0;
@@ -132,8 +132,8 @@ Parser askAndParseUserInput() {
     printf("Enter a valid command:\n");
     char* inputString = getStringFromStdin();
     parser.type = getInputTypeFromString(inputString, &parser);
-    if( parser.type == InsertGroupInGroupList ) {
-        adaptParserForGroupCreationWithInputString(&parser, inputString);
+    if( parser.type == InsertGroupInGroupList || parser.type == SendMessageToContact ) {
+        joinThirdParamaterForParserWithInputString(&parser, inputString);
     }
     
     // Free Allocation

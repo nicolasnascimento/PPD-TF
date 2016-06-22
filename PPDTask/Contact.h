@@ -37,6 +37,7 @@ Contact* allocContacWithNameAndIpAddress(char* name, char* ipAddress) {
     *c  = createContactWithNameAndIpAddress(name, ipAddress);
     return c;
 }
+/// Frees the memory for a contact
 void deallocContact(void* contact) {
     free(contact);
     contact = NULL;
@@ -47,7 +48,7 @@ int isEqualContact(const void* info1, const void* info2) {
     Contact* c2 = (Contact*)info2;
     return strcmp(c1->name, c2->name);
 }
-// Data Persistance
+/// Saves contact using fwrite using a given file stream
 void saveContactWithFileStream(struct Contact* contact, FILE* filePointer) {
     if( !filePointer ) {
         fprintf(stderr, "Error while saving user %s\n",contact->name);
@@ -56,6 +57,7 @@ void saveContactWithFileStream(struct Contact* contact, FILE* filePointer) {
     // Writes to file
     fwrite(contact, sizeof(Contact), 1, filePointer);
 }
+/// Saves contact by creating/updating a file with the contact name
 void saveContact(struct Contact* contact) {
     // Opens data file
     FILE* filePointer = fopen(contact->name, "wb");
@@ -70,21 +72,7 @@ void saveContact(struct Contact* contact) {
     // Closes stream
     fclose(filePointer);
 }
-// Returns 0 if contact is a group and not a regular contact
-int contactIsGroup(const struct Contact* contact) {
-    // Formatted string
-    char formatedGroupName[strlen(contact->name + 1)];
-    strcpy(formatedGroupName, "*");
-    strcat(formatedGroupName, contact->name);
-    
-    // Tries to open file with the group data
-    FILE* filePointer = fopen(formatedGroupName, "r");
-    if( !filePointer ) {
-        return 1; // Not a group
-    }
-    fclose(filePointer);
-    return 0;
-}
+/// Dynamic allocates a contact, reading it's info from the file
 Contact* allocContactFromFileWithName(char* fileName) {
     Contact c;
     // Opens data file
@@ -99,9 +87,34 @@ Contact* allocContactFromFileWithName(char* fileName) {
     fclose(filePointer);
     return allocContacWithNameAndIpAddress(c.name, c.ipAddress);
 }
-// Printing
+/// Prints a description for the contact
 void printDescriptionForContact(struct Contact* contact) {
     printf("Name: %s, ipAddress: %s\n", contact->name, contact->ipAddress);
 }
+
+// MARK - GROUP FUNCTIONS
+/// Returns 0 if contact is a group and not a regular contact
+int contactIsGroup(const struct Contact* contact) {
+    // Formatted string
+    char formatedGroupName[strlen(contact->name) + 2];
+    strcpy(formatedGroupName, "*");
+    strcat(formatedGroupName, contact->name);
+    
+    // Tries to open file with the group data
+    FILE* filePointer = fopen(formatedGroupName, "r");
+    if( !filePointer ) {
+        return 1; // Not a group
+    }
+    fclose(filePointer);
+    return 0;
+}
+///// Dynamic allocates the group name using the original name(without the '*')
+//char* allocFormattedGroupNameStringWithOriginalName(char* originalName) {
+//    char* formatedGroupName = calloc(strlen(originalName) + 1, sizeof(char));
+//    strcpy(formatedGroupName, "*");
+//    strcat(formatedGroupName, originalName);
+//    return formatedGroupName;
+//}
+
 
 #endif /* Contact_h */
