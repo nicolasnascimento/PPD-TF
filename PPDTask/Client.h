@@ -139,7 +139,9 @@ void* clientFunction(void* data) {
     ClientData* clientData = ((ClientData*)data);
     
     // Saves data to avoid never sending it
-    savePendingClientData(clientData);
+    if( clientData->shouldCreatePendingDataFile ) {
+        savePendingClientData(clientData);
+    }
     
     // A reference 
     int socketReference;
@@ -195,7 +197,9 @@ void* clientFunction(void* data) {
     send(socketReference, &clientData->clientPackage, sizeof(Package), 0);
     
     // Removes previously saved client data(send() assures it was sent)
-    removePendingClientData(clientData);
+    if( clientData->shouldCreatePendingDataFile ) {
+        removePendingClientData(clientData);
+    }
     
     // Deallocates data
     free(clientData);
