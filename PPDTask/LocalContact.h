@@ -210,6 +210,7 @@ List* allocStringListWithSpaceSeparetedString(const char* string) {
 }
 /// Saves a group component name to a fileNamed
 void appendGroupComponentNameToFileNamed(void* info, char* fileName) {
+    
     char* string = (char*)info;
     // Opens file
     FILE* filePointer = fopen(fileName, "a");
@@ -225,7 +226,8 @@ void appendGroupComponentNameToFileNamed(void* info, char* fileName) {
 }
 /// Calls saveGroupComponentNameToFileNamed() providing last contact name as the file name
 void appendGroupComponentNameToLastContactFile(void* info) {
-    appendGroupComponentNameToFileNamed(info, localContact.contact->name);
+    Contact* c = localContact.contactList->lastNode->info;
+    appendGroupComponentNameToFileNamed(info, c->name);
 }
 /// Creates a contact in the list of contact of the local contact, marking it as a group
 void createGroupWithGroupNameAndComponents(const char* groupName,const char* groupComponents) {
@@ -237,6 +239,10 @@ void createGroupWithGroupNameAndComponents(const char* groupName,const char* gro
     // Contact Creation
     Contact* c = allocContacWithNameAndIpAddress(formatedGroupName, "0.0.0.0"); // This ipAddress shall not be used
     appendObject(localContact.contactList, c);
+    
+    // Create file
+    FILE* fileCreationPointer = fopen(formatedGroupName, "w");
+    fclose(fileCreationPointer);
     
     // Save name list to file
     List* nameList = allocStringListWithSpaceSeparetedString(groupComponents);

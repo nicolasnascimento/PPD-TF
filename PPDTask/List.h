@@ -26,7 +26,7 @@ typedef struct ListNode{
     void* info;
     struct ListNode* next;
     struct ListNode* previous;
-}ListNode;
+} ListNode;
 
 /// Defines a regular List Data Structure
 typedef struct List {
@@ -88,8 +88,9 @@ void appendObject(struct List* list, void* info) {
     
     // Create the node
     ListNode* node = malloc(sizeof(ListNode*));
+    ListNode* previous = list->lastNode;
     node->info = info;
-    node->previous = list->lastNode;
+    node->previous = previous;
     node->next = NULL;
     
     // First item in list
@@ -99,6 +100,7 @@ void appendObject(struct List* list, void* info) {
         // Appends at the end
     }else{
         list->lastNode->next = node;
+        list->lastNode->previous = previous;
         list->lastNode = node;
     }
     
