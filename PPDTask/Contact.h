@@ -113,6 +113,7 @@ void printDescriptionForContact(struct Contact* contact) {
         }else{
             // Buffer to read from file
             char buffer[MAX_NAME_LENGTH] = "";
+            printf("[\n");
             while (!feof(filePointer)) {
                 // Assures buffer is empty
                 strcpy(buffer, "");
@@ -122,13 +123,10 @@ void printDescriptionForContact(struct Contact* contact) {
                 
                 // Assures a string has been read
                 if( strcmp(buffer, "") != 0 ) {
-                    
-                    // TODO - Fix this
-                    Contact *c = allocContacWithNameAndIpAddress(buffer, "Grouped");
-                    printDescriptionForContact(c);
-                    deallocContact(c);
+                    printf("\tName: %s\n", buffer);
                 }
             }
+            printf("]\n");
             
             //Closes file stream
             fclose(filePointer);
@@ -139,12 +137,5 @@ void printDescriptionForContact(struct Contact* contact) {
     }
     
 }
-///// Dynamic allocates the group name using the original name(without the '*')
-//char* allocFormattedGroupNameStringWithOriginalName(char* originalName) {
-//    char* formatedGroupName = calloc(strlen(originalName) + 1, sizeof(char));
-//    strcpy(formatedGroupName, "*");
-//    strcat(formatedGroupName, originalName);
-//    return formatedGroupName;
-//}
 
 #endif /* Contact_h */

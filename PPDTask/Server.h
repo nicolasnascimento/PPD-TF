@@ -7,7 +7,7 @@
 //
 
 #ifndef SERVER_PORT
-#define SERVER_PORT 12351
+#define SERVER_PORT 12352
 #endif
 
 #ifndef Server_h
